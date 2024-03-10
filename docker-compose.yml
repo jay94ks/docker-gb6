@@ -1,0 +1,33 @@
+version: '3.4'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - web-db
+    container_name: 'web'
+    volumes:
+      - "./src:/app/volume"
+    ports: 
+        - 80:8000 # 기본 포트가 아닌 다른 포트로 사용하시려면 포트 번호를 변경해 주세요.
+        #- 22:22001#  <--SSH 접근이 필요하면 사용하세요.
+    links: 
+        - 'web-db'
+        
+  web-db:
+    image: 'mysql:latest'
+    container_name: 'web-db' # 설치하실때 호스트 명에 web-db를 그대로 입력하셔도 됩니다.
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'gb6'
+      MYSQL_USER: 'gb6'
+      MYSQL_PASSWORD: 'abcd1!'
+      MYSQL_ROOT_PASSWORD: 'abcd1!' # DB 루트 계정이 필요하지 않다면 지정하지 마세요.
+    volumes:
+      - './db:/var/lib/mysql'
+    ports: # DB에 직접 접근해서 볼 수 있어야 하는게 아니라면 지정하지 마세요.
+      - '3306:3306'
+    command:
+      - '--character-set-server=utf8mb4'
+      - '--collation-server=utf8mb4_unicode_ci'
